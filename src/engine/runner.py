@@ -24,7 +24,7 @@ def main(config_path: str):
 
     run_id = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     out = make_output_dirs(run_id, root=cfg.get("output_root", "Output"))
-    db_path = Path(cfg.get("output_root", "Output")) / "experiment.sqlite"
+    db_path = Path(cfg.get("output_root", "Output")) / "experiments.sqlite"
 
     # ---- seed & device ----
     set_seed(int(cfg.get("seed", 42)))

@@ -23,11 +23,16 @@ class ExperimentDB:
     """Lightweight wrapper around a SQLite database for experiment tracking."""
 
     def __init__(self, db_path):
-        """Open or create a new database file and ensure tables exist."""
+        """
+        Open or create a new database file and ensure tables exist.
+        - (Foreign keys)  It is a column(s) in one table that refererences the primary key of another table.
+                          In this schema, the `epochs` and `test_results` tables declare `run_id` as a freign key pointing to runs(run_id),
+                          with `ON DELETE CASCADE` so that deleting a run automatically removes its related epoch and test records.
+        """
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.db_path)
-        self.conn.execute("PRAGMA foreign_keys = ON;")
+        self.conn.execute("PRAGMA foreign_keys = ON;") 
         self._init_schema()
 
     def __enter__(self):
@@ -89,7 +94,7 @@ class ExperimentDB:
     def log_run_start(self, run_id, output_dir, config: Mapping[str, Any]):
         """Insert a run row if it doesn't exit."""
 
-        config_json = json.dumps(config, default=str) # ?
+        config_json = json.dumps(config, default=str) 
         self.conn.execute(
             """
             INSERT OR IGNORE INTO runs (run_id, started_at, output_dir, config_json)
