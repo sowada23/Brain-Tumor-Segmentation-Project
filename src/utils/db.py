@@ -46,7 +46,7 @@ class ExperimentDB:
         self.conn.executescript(
             """
             CREATE TABLE IF NOT EXISTS runs (
-                run_id TEXT PRIMARY KET,
+                run_id TEXT PRIMARY KEY,
                 started_at TEXT NOT NULL,
                 output_dir TEXT NOT NULL,
                 config_json TEXT,
@@ -61,18 +61,18 @@ class ExperimentDB:
                 epoch INTEGER NOT NULL,
                 train_loss REAL,
                 train_accuracy REAL,
-                trai_dice_no_bg REAL,
+                train_dice_no_bg REAL,
                 train_mean_iou REAL,
                 val_loss REAL,
                 val_accuracy REAL,
                 val_dice_no_bg REAL,
                 val_mean_iou REAL,
                 lr REAL,
-                logged at TEXT NOT NULL,
+                logged_at TEXT NOT NULL,
                 FOREIGN KEY(run_id) REFERENCES runs(run_id) ON DELETE CASCADE
             );
 
-            CERATE TABLE IF NOT EXISTS test_results(
+            CREATE TABLE IF NOT EXISTS test_results(
                 run_id TEXT PRIMARY KEY,
                 loss REAL,
                 accuracy REAL,
@@ -99,7 +99,7 @@ class ExperimentDB:
         )
         self.conn.commit()
 
-    def log_epoch(self, run_id, epoch, train_metrics: Mapping[str, Any], val_metrics: Mapping[str, Any], lr):
+    def log_epoch(self, run_id: str, epoch: int, train_metrics: Mapping[str, Any], val_metrics: Mapping[str, Any], lr: float):
         """Record metrics for a single trainning epoch."""
 
         self.conn.execute(
@@ -108,8 +108,8 @@ class ExperimentDB:
                 run_id, epoch,
                 train_loss, train_accuracy, train_dice_no_bg, train_mean_iou,
                 val_loss, val_accuracy, val_dice_no_bg, val_mean_iou,
-                lr, logged at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                lr, logged_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 run_id,
@@ -147,7 +147,7 @@ class ExperimentDB:
         self.conn.execute(
             """
             INSERT OR REPLACE INTO test_results (
-            run_id, loss, accuracy, dice_no_bg, mean_iou, logged
+            run_id, loss, accuracy, dice_no_bg, mean_iou, logged_at
             ) VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
