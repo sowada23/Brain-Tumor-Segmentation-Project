@@ -118,6 +118,68 @@ PYTHONPATH=. python scripts/visualize.py \
 - `--case` specifies the patient ID to visualize.
 - `--slice` specifies the axial slice number to display.
 
+### Inspecting the experiments database
+
+Training writes run metadata and metrics to `Output/experiments.sqlite`. You can browse it without any external tools:
+
+```bash
+# Quick textual view of tables, schemas, and the latest rows
+PYTHONPATH=. python scripts/view_db.py --db Output/experiments.sqlite --limit 5
+
+# Drop into the SQLite shell for ad-hoc queries
+sqlite3 Output/experiments.sqlite
+sqlite> .tables
+sqlite> SELECT * FROM runs LIMIT 3;
+```
+
+If your database lives elsewhere (e.g., copied from another machine), pass `--db /path/to/your.sqlite` to the helper script.
+
+### Statistics and example queries
+
+The training runner uses `src/utils/db.py` to log every run, epoch, and test result into three SQLite tables:
+
+- `runs` — run-level info such as start/end timestamps, commit hash, config JSON, and best validation scores.
+- `epochs` — per-epoch metrics (loss, dice/IoU, learning rate, etc.).
+- `test_results` — final held-out test metrics for the run.
+
+You can perform quick sanity checks or aggregations directly in the SQLite shell:
+
+```sql
+-- Most recent runs with their best validation Dice (no background)
+SELECT run_id, started_at, best_val_dice
+FROM runs
+ORDER BY started_at DESC
+LIMIT 5;
+
+-- Per-epoch learning curve for a specific run
+SELECT epoch, loss, val_loss, dice_no_bg, val_dice_no_bg
+FROM epochs
+WHERE run_id = '20251231_144658'
+ORDER BY epoch;
+
+-- Best-performing checkpoint path for each run
+SELECT run_id, best_checkpoint_path, best_val_dice
+FROM runs
+WHERE best_checkpoint_path IS NOT NULL;
+
+-- Compare final test metrics across runs
+SELECT run_id, test_dice_no_bg, test_mean_iou
+FROM test_results
+ORDER BY test_dice_no_bg DESC;
+
+-- Simple overfitting probe: last-epoch train vs. val loss
+SELECT e.run_id, e.loss AS train_loss, e.val_loss
+FROM epochs e
+JOIN (
+  SELECT run_id, MAX(epoch) AS max_epoch
+  FROM epochs
+  GROUP BY run_id
+) last ON e.run_id = last.run_id AND e.epoch = last.max_epoch
+ORDER BY e.val_loss ASC;
+```
+
+Feel free to adapt these queries when exploring the database produced by your own runs. The schema is created automatically when `scripts/train.py` starts, so no manual setup is required.
+
 ## Results
 
 The model was trained for 40 epochs using the configuration specified in `configs/default.yaml`. The following results were achieved on the validation set.
