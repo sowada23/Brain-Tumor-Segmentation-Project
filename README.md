@@ -10,6 +10,7 @@ This project provides a complete pipeline for brain tumor segmentation using a 2
 - [Usage](#usage)
   - [Training](#training)
   - [Visualization](#visualization)
+  - [Inspecting the experiments database] (#inspecting-the-experiments-database)
 - [Results](#results)
   - [Evaluation Metrics](#evaluation-metrics)
   - [Training & Validation Curves](#training--validation-curves)
