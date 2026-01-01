@@ -124,9 +124,6 @@ PYTHONPATH=. python scripts/visualize.py \
 Training writes run metadata and metrics to `Output/experiments.sqlite`. You can browse it without any external tools:
 
 ```bash
-# Quick textual view of tables, schemas, and the latest rows
-PYTHONPATH=. python scripts/view_db.py --db Output/experiments.sqlite --limit 5
-
 # Drop into the SQLite shell for ad-hoc queries
 sqlite3 Output/experiments.sqlite
 sqlite> .tables
