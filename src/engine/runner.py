@@ -16,6 +16,8 @@ from ..models.unet2d import UNet2D
 from ..losses.combined import CombinedLoss
 from .train import train_one_epoch, evaluate
 
+import os
+
 
 def main(config_path: str):
     # ---- load config ----
@@ -69,6 +71,8 @@ def main(config_path: str):
     save_splits(out["logs"], run_id, {"train": train_ids, "val": val_ids, "test": test_ids})
 
     # ---- data loaders ----
+    
+    cfg["data_root"] = os.environ.get("DATA_ROOT", cfg["data_root"])
     roots = [cfg["data_root"]]
     ds_args = dict(
         img_size=int(cfg.get("img_size", 128)),
