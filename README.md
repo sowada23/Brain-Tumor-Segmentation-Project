@@ -92,14 +92,14 @@ Follow these steps to set up the project environment.
 
 ## Usage
 
-All scripts should be run from the root directory of the project. The `PYTHONPATH=.` prefix is required to ensure Python can find the `src` module.
+All scripts should be run from the root directory of the project. 
 
 ### Training
 
 To train the model, run the `train.py` script with a specified configuration file.
 
 ```bash
-PYTHONPATH=. python scripts/train.py -c configs/small.yaml
+python -m scripts.train -c configs/small.yaml
 ```
 Progress will be printed to the console, and the trained model weights (`best_model.pt` and `last_model.pt`) will be saved in a timestamped folder inside the `Output/` directory.  If you want to train with more number of epochs and batch size, try run the above scrpit with `defalut.yaml`.
 
