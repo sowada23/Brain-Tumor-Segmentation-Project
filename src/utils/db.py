@@ -147,6 +147,7 @@ class ExperimentDB:
         self.conn.commit()
 
     def log_test_results(self, run_id, metrics: Mapping[str, Any]):
+        # Mapping[] limits input type to any mappling (eg, dict)
         """Persist final test metrics after training finishes."""
 
         self.conn.execute(
