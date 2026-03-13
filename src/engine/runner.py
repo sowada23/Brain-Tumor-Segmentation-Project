@@ -24,6 +24,19 @@ def main(config_path: str):
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
+    # ---- dataset path handling ---- #
+    cfg_data_root = Path(cfg["data_root"]).expanduser()
+    resolved_data_root = Path(os.environ.get("DATA_ROOT", cfg_data_root))
+
+    if not resolved_data_root.is_absolute():
+        resolved_data_root = (Path(config_path).resolve().parent / resolved_data_root).resolve()
+
+    if not resolved_data_root.exists():
+        raise FileNotFoundError(f"Dataset path not found: {resolved_data_root}")
+
+    cfg["data_root"] = str(resolved_data_root)
+    print(f"Using data root: {cfg['data_root']}")
+
     run_id = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     out = make_output_dirs(run_id, root=cfg.get("output_root", "Output"))
     db_path = Path(cfg.get("output_root", "Output")) / "experiments.sqlite"
@@ -71,8 +84,7 @@ def main(config_path: str):
     save_splits(out["logs"], run_id, {"train": train_ids, "val": val_ids, "test": test_ids})
 
     # ---- data loaders ----
-    
-    cfg["data_root"] = os.environ.get("DATA_ROOT", cfg["data_root"])
+
     roots = [cfg["data_root"]]
     ds_args = dict(
         img_size=int(cfg.get("img_size", 128)),
