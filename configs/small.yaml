@@ -16,7 +16,7 @@ alpha: 0.5
 beta: 0.5
 dropout: 0.35
 
-seed: 42
+seed: 41
 device: auto
 output_root: "Output"
 lr_patience: 2
