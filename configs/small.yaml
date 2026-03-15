@@ -18,7 +18,7 @@ dropout: 0.35
 
 seed: 41
 device: auto
-output_root: "Output"
+output_root: "../outputs"
 lr_patience: 2
 lr_min: 0.00001
 
