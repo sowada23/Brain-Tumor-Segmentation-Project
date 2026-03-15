@@ -1,4 +1,4 @@
-data_root: "./data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+data_root: "../../data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 input_modalities: ["flair", "t1ce"]
 val_split: 0.15
 test_split: 0.15
